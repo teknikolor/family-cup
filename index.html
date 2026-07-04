@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101642">
+<title>The Family Cup 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#101642; --navy2:#1b2570; --cream:#FBF4E6; --red:#EA3B3B;
+  --blue:#2E9BE0; --green:#3EA750; --gold:#FFC531; --gold-deep:#E39A0C;
+  --ink:#231b10; --shadow:0 10px 30px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:'Fredoka',system-ui,sans-serif;
+  color:var(--cream);
+  background:
+    radial-gradient(1200px 500px at 50% -10%, #2a337f 0%, rgba(42,51,127,0) 60%),
+    radial-gradient(900px 600px at 80% 110%, #3a1c5e 0%, rgba(58,28,94,0) 55%),
+    linear-gradient(180deg,#0d1238 0%, #101642 45%, #171a3c 100%);
+  background-attachment:fixed;
+  min-height:100vh;
+}
+.stars{position:fixed;inset:0;pointer-events:none;opacity:.5;z-index:0}
+.wrap{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:0 18px 48px;min-height:100vh;display:flex;flex-direction:column}
+
+/* bunting */
+.bunting{display:flex;height:26px;margin:0 -18px 6px;overflow:hidden}
+.bunting span{flex:1;height:100%;clip-path:polygon(0 0,100% 0,50% 100%);opacity:.95}
+
+/* top bar */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 0 4px}
+.brand{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;color:var(--gold);line-height:1}
+.iconbtn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:var(--cream);
+  width:38px;height:38px;border-radius:12px;font-size:17px;display:grid;place-items:center;cursor:pointer}
+.iconbtn:active{transform:scale(.94)}
+.topbtns{display:flex;gap:8px}
+
+/* progress */
+.progress{display:flex;gap:6px;margin:8px 0 14px}
+.pip{flex:1;height:7px;border-radius:99px;background:rgba(255,255,255,.14)}
+.pip.done{background:var(--green)}
+.pip.now{background:var(--gold)}
+
+/* headers */
+.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);font-weight:600;margin-bottom:2px}
+.round-title{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:.92;letter-spacing:1px;margin:0}
+.round-note{color:rgba(251,244,230,.7);font-size:15px;margin-top:4px}
+
+/* cards */
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:20px;padding:14px;margin-top:14px;box-shadow:var(--shadow)}
+.match{display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;gap:10px}
+.vs{align-self:center;font-family:'Bebas Neue',sans-serif;font-size:22px;color:rgba(251,244,230,.55);letter-spacing:1px}
+.pick{
+  position:relative;background:var(--cream);color:var(--ink);border:none;border-radius:16px;
+  padding:20px 10px 16px;font-family:'Fredoka',sans-serif;font-weight:600;font-size:19px;cursor:pointer;
+  min-height:78px;display:flex;align-items:center;justify-content:center;text-align:center;
+  transition:transform .12s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
+  box-shadow:0 4px 0 rgba(0,0,0,.22);
+}
+.pick:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.22)}
+.pick.won{background:linear-gradient(180deg,#FFD968,#FFB61E);color:#4a3400;box-shadow:0 0 0 3px rgba(255,197,49,.35),0 6px 18px rgba(255,177,30,.45)}
+.pick.lost{opacity:.42;filter:saturate(.4)}
+.pick .crown{position:absolute;top:-16px;left:50%;transform:translateX(-50%) translateY(6px) scale(.4);opacity:0;transition:transform .3s cubic-bezier(.2,1.4,.4,1),opacity .2s;width:38px;height:38px}
+.pick.won .crown{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+.pool-tag{position:absolute;top:8px;left:10px;font-size:11px;font-weight:600;letter-spacing:.08em;color:rgba(0,0,0,.35)}
+
+/* standings */
+.pool-block{margin-top:14px}
+.pool-head{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;color:var(--gold);margin:6px 2px}
+.stand-row{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);
+  border-radius:14px;padding:12px 14px;margin-top:8px;cursor:pointer;transition:.15s}
+.stand-row.adv{background:linear-gradient(180deg,rgba(255,197,49,.22),rgba(255,197,49,.08));border-color:rgba(255,197,49,.55)}
+.stand-row .nm{font-weight:600;font-size:18px;flex:1}
+.stand-row .rec{font-size:14px;color:rgba(251,244,230,.65)}
+.stand-row .chk{width:24px;height:24px;border-radius:8px;border:2px solid rgba(255,255,255,.25);display:grid;place-items:center;font-size:14px}
+.stand-row.adv .chk{background:var(--gold);border-color:var(--gold);color:#4a3400}
+.hint{font-size:13px;color:rgba(251,244,230,.6);margin:10px 2px 0}
+
+/* knockout label */
+.ko-badge{display:inline-block;background:var(--red);color:#fff;font-weight:600;font-size:12px;letter-spacing:.1em;
+  text-transform:uppercase;padding:5px 12px;border-radius:99px;margin-bottom:6px}
+.ko-badge.blue{background:var(--blue)} .ko-badge.gold{background:var(--gold);color:#4a3400}
+.gamebanner{margin:12px 0 2px;background:rgba(255,197,49,.12);border:1px solid rgba(255,197,49,.42);border-radius:16px;padding:12px 14px;text-align:center}
+.gamebanner .lbl{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.gamebanner .g{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;color:var(--cream);line-height:1.06;margin-top:2px}
+.gamebanner .seq{font-size:14px;color:rgba(251,244,230,.78);margin-top:3px}
+
+/* intermission page */
+.gap{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:14px 0 0}
+.gap-head{font-family:'Bebas Neue',sans-serif;font-size:46px;line-height:.95;letter-spacing:1px;margin:8px 0 2px;
+  background:linear-gradient(180deg,#FFE38A,#FFB61E);-webkit-background-clip:text;background-clip:text;color:transparent}
+.gapgif{width:min(82vw,340px);margin:16px auto 6px;border-radius:20px;overflow:hidden;border:3px solid rgba(255,197,49,.5);
+  box-shadow:0 16px 34px rgba(0,0,0,.4)}
+.gapgif img{display:block;width:100%}
+.gapgif.broke{display:none}
+.gapcrown{width:120px;margin:24px auto 10px}
+.gapcrown svg{width:100%;height:auto;position:static;transform:none;opacity:1}
+.gap-note{color:rgba(251,244,230,.75);font-size:15px;max-width:300px;margin:6px auto 4px}
+.gap .cta{max-width:340px}
+
+/* buttons */
+.spacer{flex:1}
+.cta{width:100%;margin-top:20px;padding:18px;border:none;border-radius:18px;font-family:'Fredoka',sans-serif;font-weight:600;
+  font-size:19px;cursor:pointer;background:linear-gradient(180deg,#3fb85a,#2f9146);color:#fff;box-shadow:0 5px 0 #226b34;transition:.12s}
+.cta:active{transform:translateY(3px);box-shadow:0 2px 0 #226b34}
+.cta.disabled{background:#3a3f66;box-shadow:0 5px 0 #2a2e4c;color:rgba(255,255,255,.5);pointer-events:none}
+.cta.gold{background:linear-gradient(180deg,#FFD968,#FFB61E);color:#4a3400;box-shadow:0 5px 0 var(--gold-deep)}
+.cta.gold:active{box-shadow:0 2px 0 var(--gold-deep)}
+.cta.danger{background:linear-gradient(180deg,#ef5b5b,#c93636);color:#fff;box-shadow:0 5px 0 #8f2626}
+.cta.danger:active{box-shadow:0 2px 0 #8f2626}
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#0c1030;color:var(--cream);
+  border:1px solid rgba(255,255,255,.16);border-radius:99px;padding:12px 18px;font-size:14px;font-weight:500;z-index:80;
+  opacity:0;pointer-events:none;transition:.25s;max-width:88vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.ghost{background:none;border:none;color:rgba(251,244,230,.7);font-family:'Fredoka';font-size:15px;font-weight:500;cursor:pointer;padding:8px}
+
+/* home */
+.home{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:6px;padding:20px 0}
+.home h1{font-family:'Bebas Neue',sans-serif;font-size:82px;line-height:.85;margin:0;letter-spacing:1px;
+  background:linear-gradient(180deg,#FFE38A,#FFB61E);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 10px rgba(255,177,30,.3))}
+.home .sub{font-size:17px;color:rgba(251,244,230,.8);max-width:300px;margin:4px auto 0}
+.home .yr{font-family:'Bebas Neue';font-size:22px;letter-spacing:6px;color:var(--red)}
+.roster{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin:18px 0 6px;max-width:340px}
+.chip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:99px;padding:6px 12px;font-size:14px;font-weight:500}
+
+/* champion */
+.champ{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:12px 0 0}
+.champ .lead{font-family:'Bebas Neue';font-size:30px;letter-spacing:3px;color:var(--gold);margin-top:6px}
+.champ .name{font-family:'Bebas Neue';font-size:76px;line-height:.9;margin:2px 0 4px;
+  background:linear-gradient(180deg,#FFE38A,#FFB61E);-webkit-background-clip:text;background-clip:text;color:transparent}
+.champ .tag{color:rgba(251,244,230,.8);font-size:16px}
+#trophyCanvas{width:min(70vw,270px);height:auto;margin:14px auto 4px;filter:drop-shadow(0 16px 30px rgba(255,177,30,.35))}
+.trophygif{width:min(74vw,290px);margin:14px auto 4px;filter:drop-shadow(0 16px 30px rgba(255,177,30,.35))}
+.trophygif img{width:100%;border-radius:18px;display:block}
+.gifbox{margin:12px auto 0;max-width:280px;border-radius:16px;overflow:hidden;border:2px solid rgba(255,255,255,.15)}
+.gifbox img{display:block;width:100%}
+
+/* overlays */
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+.sheet{position:fixed;inset:0;background:rgba(8,10,30,.72);z-index:60;display:none;align-items:flex-end;justify-content:center;padding:16px}
+.sheet.open{display:flex}
+.sheet-inner{background:#181d45;border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:20px;width:100%;max-width:480px;max-height:86vh;overflow:auto}
+.sheet-inner h3{font-family:'Bebas Neue';font-size:28px;letter-spacing:1px;margin:0 0 4px;color:var(--gold)}
+.sheet-inner p{font-size:14px;color:rgba(251,244,230,.7);margin:0 0 14px}
+.field{margin-top:12px}
+.field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:rgba(251,244,230,.85)}
+.field input,.field textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.25);color:var(--cream);font-family:'Fredoka';font-size:15px}
+.field textarea{min-height:66px;resize:vertical;line-height:1.5}
+.roundgif{margin-top:14px;text-align:center}
+.roundgif img{max-width:260px;border-radius:16px;border:2px solid rgba(255,255,255,.15)}
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<canvas class="stars" id="stars"></canvas>
+<div class="wrap">
+  <div class="bunting" id="bunting"></div>
+  <div class="topbar">
+    <div class="brand">FAMILY CUP</div>
+    <div class="topbtns">
+      <button class="iconbtn" id="soundBtn" title="Sound">&#128266;</button>
+      <button class="iconbtn" id="gifBtn" title="GIFs">&#127916;</button>
+      <button class="iconbtn" id="resetBtn" title="Reset">&#8635;</button>
+    </div>
+  </div>
+  <div id="app"></div>
+</div>
+
+<canvas id="confetti"></canvas>
+
+<div class="sheet" id="gifSheet">
+  <div class="sheet-inner">
+    <h3>Drop in your GIFs</h3>
+    <p>Paste Giphy links. A page link like giphy.com/gifs/... works fine, no need to hunt for the direct file.</p>
+    <div id="gifFields"></div>
+    <button class="cta" id="gifSave" style="margin-top:18px">Save</button>
+    <button class="ghost" id="gifClose" style="width:100%;margin-top:6px">Close</button>
+  </div>
+</div>
+
+<div class="sheet" id="confirmSheet">
+  <div class="sheet-inner" style="max-width:360px">
+    <h3 id="confirmTitle">Start over?</h3>
+    <p id="confirmMsg">This clears every result. Your GIFs stay saved.</p>
+    <button class="cta danger" id="confirmYes">Yes, reset</button>
+    <button class="ghost" id="confirmNo" style="width:100%;margin-top:6px">Cancel</button>
+  </div>
+</div>
+
+<script>
+/* ---------- CONFIG: edit players, pools, and match-ups here ---------- */
+const T = {
+  year: 2026,
+  pools: {
+    A: ['Ian','Doug','Delaney','Eero'],
+    B: ['Megan','Caitlin','Gram','Aldrin'],
+  },
+  rounds: [
+    { key:'r1', game:'Ladderball', note:'Round 1 · pool round robin', matches:[['Ian','Doug'],['Delaney','Eero'],['Megan','Caitlin'],['Gram','Aldrin']] },
+    { key:'r2', game:'Cornhole',   note:'Round 2 · pool round robin', matches:[['Ian','Delaney'],['Doug','Eero'],['Megan','Gram'],['Caitlin','Aldrin']] },
+    { key:'r3', game:'Doink',      note:'Round 3 · pool round robin', matches:[['Ian','Eero'],['Doug','Delaney'],['Megan','Aldrin'],['Caitlin','Gram']] },
+    { key:'r4', game:'Beachball',  note:'Round 4 · crossover, everyone plays', matches:[['Ian','Megan'],['Doug','Caitlin'],['Delaney','Gram'],['Eero','Aldrin']] },
+    { key:'r5', game:'Ring Toss',  note:'Round 5 · crossover, everyone plays', matches:[['Ian','Caitlin'],['Doug','Megan'],['Delaney','Aldrin'],['Eero','Gram']] },
+  ],
+  knockout: {
+    sf1:  { game:'Cornhole' },
+    sf2:  { game:'Cornhole' },
+    third:{ game:'Ring Toss' },
+    final:{ games:['Ladderball','Doink','Beachball'] },
+  },
+};
+const ORDER = ['home','r1','r2','r3','r4','r5','standings','sf1','sf2','third','final','champion'];
+
+/* ---------- storage (safe: falls back to memory) ---------- */
+let mem = {};
+const store = {
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return mem[k]??null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){ mem[k]=v; } },
+};
+function poolOf(name){ return T.pools.A.includes(name)?'A':'B'; }
+
+let state = load();
+function emptyGifs(){ const g={games:{},audio:{},defaultGifs:[],defaultAudio:'',champ:'',champAudio:'',trophy:''}; T.rounds.forEach(r=>{ g.games[r.key]=[]; g.audio[r.key]=''; }); return g; }
+function normGifs(g){
+  const out=emptyGifs();
+  if(g&&g.games){ T.rounds.forEach(r=>{ if(Array.isArray(g.games[r.key])) out.games[r.key]=g.games[r.key]; }); }
+  if(g&&g.audio){ T.rounds.forEach(r=>{ if(typeof g.audio[r.key]==='string') out.audio[r.key]=g.audio[r.key]; }); }
+  if(g&&Array.isArray(g.defaultGifs)) out.defaultGifs=g.defaultGifs;
+  if(g&&typeof g.defaultAudio==='string') out.defaultAudio=g.defaultAudio;
+  if(g&&typeof g.champ==='string') out.champ=g.champ;
+  if(g&&typeof g.champAudio==='string') out.champAudio=g.champAudio;
+  if(g&&typeof g.trophy==='string') out.trophy=g.trophy;
+  return out;
+}
+function load(){
+  try{ const s = JSON.parse(store.get('familycup')); if(s&&s.v===5){ s.gifs=normGifs(s.gifs); return s; } }catch(e){}
+  return { v:5, screen:'home', group:{}, sel:{A:[],B:[]}, advancers:null, ko:{}, gifs:emptyGifs() };
+}
+function save(){ store.set('familycup', JSON.stringify(state)); }
+
+/* turn any Giphy link (page, embed, share, or direct) into a displayable .gif URL */
+function toGifUrl(u){
+  if(!u) return u;
+  u=(''+u).trim();
+  if(/\.(gif|webp|mp4|png|jpg|jpeg)(\?|#|$)/i.test(u)) return u;
+  if(/\/\/(media\d*\.giphy\.com|i\.giphy\.com)\//i.test(u)) return u;
+  let m = u.match(/giphy\.com\/(?:gifs|clips|stickers)\/(?:.*-)?([A-Za-z0-9]{6,})/i)
+       || u.match(/giphy\.com\/embed\/([A-Za-z0-9]{6,})/i)
+       || u.match(/giphy\.com\/media\/([A-Za-z0-9]{6,})/i)
+       || u.match(/tenor\.com\/view\/[^\/]*-(\d{6,})/i);
+  if(m && m[1]) return 'https://media.giphy.com/media/'+m[1]+'/giphy.gif';
+  return u;
+}
+function toast(msg){
+  let t=document.getElementById('toast');
+  if(!t){ t=document.createElement('div'); t.id='toast'; document.body.appendChild(t); }
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+/* ---------- audio ---------- */
+let actx=null, muted=(store.get('fc_mute')==='1');
+function ac(){ if(!actx){ try{ actx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(actx&&actx.state==='suspended') actx.resume(); return actx; }
+function note(freq,start,dur,type,gain){
+  const c=ac(); if(!c||muted) return;
+  const o=c.createOscillator(), g=c.createGain();
+  o.type=type||'triangle'; o.frequency.value=freq;
+  o.connect(g); g.connect(c.destination);
+  const t=c.currentTime+start;
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(gain||.22,t+.02);
+  g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.start(t); o.stop(t+dur+.02);
+}
+function sWin(){ note(659,0,.16,'triangle',.22); note(988,.09,.28,'triangle',.2); }
+function sRound(){ [523,659,784,1047].forEach((f,i)=>note(f,i*.09,.3,'triangle',.2)); }
+function sChamp(){ [523,659,784,1047,1319].forEach((f,i)=>note(f,i*.12,.5,'sawtooth',.16));
+  [392,523].forEach((f,i)=>note(f,i*.12,.9,'triangle',.14)); note(1568,.6,.9,'triangle',.14); }
+function sOff(){ note(330,0,.14,'sine',.16); note(247,.06,.18,'sine',.14); }
+
+/* per-game musical stings (used when no audio clip URL is set) */
+const JINGLES={
+  r1:[[523,.12],[659,.12],[784,.20],[1047,.32]],
+  r2:[[784,.12],[622,.12],[784,.12],[1047,.34]],
+  r3:[[659,.10],[659,.10],[880,.18],[784,.34]],
+  r4:[[440,.12],[554,.12],[659,.12],[880,.34]],
+  r5:[[523,.10],[784,.10],[659,.10],[1047,.12],[1319,.4]],
+};
+function playJingle(rkey){
+  const seq=JINGLES[rkey]||JINGLES.r1; let t=0;
+  seq.forEach(([f,d])=>{ note(f,t,d+.06,'triangle',.2); note(f/2,t,d+.06,'sine',.08); t+=d; });
+}
+let clipEl=null;
+function playClip(url){
+  if(muted||!url) return false;
+  try{ if(clipEl){ clipEl.pause(); } clipEl=new Audio(url); clipEl.volume=.9; clipEl.play().catch(()=>{}); return true; }
+  catch(e){ return false; }
+}
+function stopClip(){ try{ if(clipEl){ clipEl.pause(); clipEl=null; } }catch(e){} }
+
+/* ---------- confetti ---------- */
+const cc=document.getElementById('confetti'), cx=cc.getContext('2d');
+let parts=[], raf=null;
+function sizeCanvas(){ cc.width=innerWidth; cc.height=innerHeight; }
+addEventListener('resize',sizeCanvas); sizeCanvas();
+const COLORS=['#FFC531','#EA3B3B','#2E9BE0','#3EA750','#FBF4E6','#E39A0C'];
+function burst(n,big){
+  for(let i=0;i<n;i++){
+    parts.push({x:innerWidth*(big?Math.random():.5), y:big?-20:innerHeight*.35,
+      vx:(Math.random()-.5)*(big?10:8), vy:(big?Math.random()*3+2:-(Math.random()*10+6)),
+      g:.22+Math.random()*.12, s:6+Math.random()*7, r:Math.random()*6, vr:(Math.random()-.5)*.4,
+      c:COLORS[(Math.random()*COLORS.length)|0], life:0, max:big?260:120});
+  }
+  if(!raf) raf=requestAnimationFrame(tick);
+}
+function tick(){
+  cx.clearRect(0,0,cc.width,cc.height);
+  parts=parts.filter(p=>p.life<p.max&&p.y<innerHeight+40);
+  parts.forEach(p=>{
+    p.life++; p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; p.vx*=.99;
+    cx.save(); cx.translate(p.x,p.y); cx.rotate(p.r); cx.fillStyle=p.c;
+    cx.globalAlpha=Math.max(0,1-p.life/p.max);
+    cx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6); cx.restore();
+  });
+  if(parts.length) raf=requestAnimationFrame(tick); else { raf=null; cx.clearRect(0,0,cc.width,cc.height); }
+}
+function fireworks(){ let n=0; const iv=setInterval(()=>{ burst(60,true); if(++n>6) clearInterval(iv); },500); }
+
+/* ---------- decor ---------- */
+(function(){
+  const b=document.getElementById('bunting'), cols=['var(--red)','var(--cream)','var(--blue)','var(--gold)'];
+  for(let i=0;i<12;i++){ const s=document.createElement('span'); s.style.background=cols[i%cols.length]; b.appendChild(s); }
+  const sc=document.getElementById('stars'), sx=sc.getContext('2d');
+  function ss(){ sc.width=innerWidth; sc.height=innerHeight; sx.clearRect(0,0,sc.width,sc.height);
+    for(let i=0;i<70;i++){ const x=Math.random()*sc.width,y=Math.random()*sc.height,r=Math.random()*1.4+.3;
+      sx.globalAlpha=Math.random()*.6+.2; sx.fillStyle='#fff'; sx.beginPath(); sx.arc(x,y,r,0,7); sx.fill(); } }
+  ss(); addEventListener('resize',ss);
+})();
+
+const CROWN='<svg class="crown" viewBox="0 0 24 24" fill="none"><path d="M3 8l4 3 5-6 5 6 4-3-2 11H5L3 8z" fill="#FFB61E" stroke="#8a5a00" stroke-width="1" stroke-linejoin="round"/><circle cx="3" cy="8" r="1.6" fill="#EA3B3B"/><circle cx="21" cy="8" r="1.6" fill="#EA3B3B"/><circle cx="12" cy="5" r="1.6" fill="#EA3B3B"/></svg>';
+
+/* ---------- helpers ---------- */
+function roundByKey(k){ return T.rounds.find(r=>r.key===k); }
+function roundDone(k){ const r=roundByKey(k); return r.matches.every((m,i)=>state.group[k+'-'+i]); }
+function winsIn(pool){
+  const players=T.pools[pool], w=Object.fromEntries(players.map(p=>[p,0]));
+  ['r1','r2','r3'].forEach(k=>roundByKey(k).matches.forEach((m,i)=>{
+    const win=state.group[k+'-'+i]; if(win&&players.includes(win)) w[win]++;
+  }));
+  return w;
+}
+function beachWin(name){ let ok=false; roundByKey('r4').matches.forEach((m,i)=>{ if(m.includes(name)&&state.group['r4-'+i]===name) ok=true; }); return ok; }
+function rankPool(pool){
+  const w=winsIn(pool);
+  return [...T.pools[pool]].sort((a,b)=> (w[b]-w[a]) || (beachWin(b)-beachWin(a)) || T.pools[pool].indexOf(a)-T.pools[pool].indexOf(b));
+}
+function other(match,name){ return match[0]===name?match[1]:match[0]; }
+
+/* ---------- render ---------- */
+const app=document.getElementById('app');
+function go(screen){ state.screen=screen; save(); render(); window.scrollTo(0,0); }
+
+function progressBar(activeKey){
+  const steps=['r1','r2','r3','r4','r5','ko'];
+  const idx=steps.indexOf(activeKey);
+  return '<div class="progress">'+steps.map((s,i)=>{
+    let cls='pip'; if(i<idx) cls+=' done'; else if(i===idx) cls+=' now';
+    return '<div class="'+cls+'"></div>';
+  }).join('')+'</div>';
+}
+
+function pickCard(rkey, idx, match){
+  const key=rkey+'-'+idx, winner=state.group[key];
+  const btn=(name)=>{
+    let cls='pick'; if(winner===name) cls+=' won'; else if(winner) cls+=' lost';
+    const tag = !['r4','r5'].includes(rkey) ? '<span class="pool-tag">Pool '+poolOf(name)+'</span>' : '';
+    return '<button class="'+cls+'" onclick="pickWin(\''+key+'\',\''+name+'\')">'+CROWN+tag+name+'</button>';
+  };
+  return '<div class="card"><div class="match">'+btn(match[0])+'<div class="vs">vs</div>'+btn(match[1])+'</div></div>';
+}
+
+function pickWin(key,name){
+  const was=state.group[key];
+  const rkey=key.split('-')[0];
+  if(was===name){ delete state.group[key]; save(); ac(); sOff(); render(); return; }
+  state.group[key]=name; save();
+  ac(); sWin(); burst(26,false);
+  render();
+  if(roundDone(rkey)){ setTimeout(()=>{ sRound(); burst(40,false); },250); }
+}
+
+function toGap(k){
+  let pool=(state.gifs.games&&state.gifs.games[k])||[];
+  if(!pool.length) pool=(state.gifs.defaultGifs)||[];
+  state.gap=k;
+  state.gapGif = pool.length ? pool[Math.floor(Math.random()*pool.length)] : '';
+  save(); go('gap');
+}
+function gifBroke(img){ const box=img.closest('.gapgif'); if(box) box.outerHTML='<div class="gapcrown">'+CROWN+'</div>'; }
+function screenGap(){
+  const k=state.gap, r=roundByKey(k);
+  const nextScreen=ORDER[ORDER.indexOf(k)+1];
+  const nextIsRound=/^r[0-9]$/.test(nextScreen);
+  const nextLabel = nextIsRound ? 'Start '+roundByKey(nextScreen).game+' &rarr;' : 'On to the bracket &rarr;';
+  let html=progressBar(nextIsRound?nextScreen:'ko');
+  html+='<div class="gap">';
+  html+='<div class="ko-badge gold">'+r.game+' &#10003;</div>';
+  html+='<div class="gap-head">Round '+k.slice(1)+' in the books</div>';
+  const gif=toGifUrl(state.gapGif);
+  if(gif){
+    html+='<div class="gapgif"><img src="'+gif+'" onerror="gifBroke(this)" alt=""></div>';
+  } else {
+    html+='<div class="gapcrown">'+CROWN+'</div>';
+  }
+  html+='<div class="gap-note">Winners locked. Reset the field and line up the next game.</div>';
+  html+='<button class="cta gold" onclick="go(\''+nextScreen+'\')">'+nextLabel+'</button>';
+  html+='<button class="ghost" onclick="go(\''+k+'\')">&larr; Back to '+r.game+'</button>';
+  html+='</div>';
+  app.innerHTML=html;
+  setTimeout(()=>{
+    burst(60,true);
+    const clip=(state.gifs.audio&&state.gifs.audio[k])||state.gifs.defaultAudio;
+    if(!playClip(clip)){ ac(); playJingle(k); }
+  },200);
+}
+
+function screenRound(k){
+  const r=roundByKey(k); const done=roundDone(k);
+  let html=progressBar(k);
+  html+='<div class="eyebrow">'+r.note+'</div>';
+  html+='<h2 class="round-title">'+r.game+'</h2>';
+  html+='<div class="round-note">Tap the winner of each match. Tap the same name again to undo.</div>';
+  r.matches.forEach((m,i)=>html+=pickCard(k,i,m));
+  html+='<button class="cta '+(done?'':'disabled')+'" onclick="'+(done?'toGap(\''+k+'\')':'')+'">'+(done?'Round complete &rarr;':'Pick every winner to continue')+'</button>';
+  if(k!=='r1') html+='<button class="ghost" style="width:100%" onclick="go(\''+ORDER[ORDER.indexOf(k)-1]+'\')">&larr; Back</button>';
+  app.innerHTML=html;
+}
+
+function screenStandings(){
+  let html=progressBar('ko');
+  html+='<div class="eyebrow">Group stage complete</div>';
+  html+='<h2 class="round-title">Who advances</h2>';
+  html+='<div class="round-note">Top two from each pool make the bracket.</div>';
+  ['A','B'].forEach(pool=>{
+    const w=winsIn(pool), ranked=rankPool(pool);
+    if(!state.sel[pool] || !state.sel[pool].length) state.sel[pool]=ranked.slice(0,2);
+    html+='<div class="pool-block"><div class="pool-head">Pool '+pool+'</div>';
+    ranked.forEach(name=>{
+      const adv=state.sel[pool].includes(name);
+      const bw=beachWin(name)?' · beachball W':'';
+      html+='<div class="stand-row'+(adv?' adv':'')+'" onclick="toggleAdv(\''+pool+'\',\''+name+'\')">'
+        +'<div class="chk">'+(adv?'&#10003;':'')+'</div>'
+        +'<div class="nm">'+name+'</div>'
+        +'<div class="rec">'+w[name]+' W'+bw+'</div></div>';
+    });
+    html+='</div>';
+  });
+  html+='<div class="hint">Tie at the cutoff? The beachball crossover breaks it. Tap any two per pool to set who advances.</div>';
+  const ok = state.sel.A.length===2 && state.sel.B.length===2;
+  html+='<button class="cta '+(ok?'gold':'disabled')+'" onclick="'+(ok?'lockBracket()':'')+'">'+(ok?'Lock the bracket &rarr;':'Pick two from each pool')+'</button>';
+  html+='<button class="ghost" style="width:100%" onclick="go(\'r5\')">&larr; Back</button>';
+  app.innerHTML=html;
+}
+function toggleAdv(pool,name){
+  const arr=state.sel[pool]; const i=arr.indexOf(name);
+  if(i>=0) arr.splice(i,1); else { if(arr.length>=2) arr.shift(); arr.push(name); }
+  save(); render();
+}
+function lockBracket(){
+  const seed=(pool)=>{ const w=winsIn(pool);
+    return [...state.sel[pool]].sort((a,b)=>(w[b]-w[a])||(beachWin(b)-beachWin(a))); };
+  const A=seed('A'), B=seed('B');
+  state.advancers={A1:A[0],A2:A[1],B1:B[0],B2:B[1]}; save(); go('sf1');
+}
+
+function koMatch(id){
+  const a=state.advancers;
+  if(id==='sf1') return [a.A1,a.B2];
+  if(id==='sf2') return [a.B1,a.A2];
+  if(id==='third'){ const l1=other(koMatch('sf1'),state.ko.sf1), l2=other(koMatch('sf2'),state.ko.sf2); return [l1,l2]; }
+  if(id==='final') return [state.ko.sf1,state.ko.sf2];
+}
+function screenKO(id){
+  const meta={
+    sf1:{badge:'Semifinal 1',cls:'',sub:'Pool A winner vs Pool B runner-up'},
+    sf2:{badge:'Semifinal 2',cls:'blue',sub:'Pool B winner vs Pool A runner-up'},
+    third:{badge:'Bronze match',cls:'',sub:'Semifinal losers play for third'},
+    final:{badge:'The Final',cls:'gold',sub:'Two pool champions, one crown'},
+  }[id];
+  const kg=T.knockout[id];
+  const m=koMatch(id), winner=state.ko[id];
+  let html=progressBar('ko');
+  html+='<div class="ko-badge '+meta.cls+'">'+meta.badge+'</div>';
+  html+='<h2 class="round-title">'+(id==='final'?'Grand Final':(id==='third'?'3rd Place':'Semifinal'))+'</h2>';
+  html+='<div class="round-note">'+meta.sub+'</div>';
+  if(id==='final'){
+    html+='<div class="gamebanner"><div class="lbl">Best of 3 · first to two</div>'
+      +'<div class="g">'+kg.games.join(' &middot; ')+'</div>'
+      +'<div class="seq">Play in that order. Stop when someone takes two.</div></div>';
+  } else {
+    html+='<div class="gamebanner"><div class="lbl">Game to play</div><div class="g">'+kg.game+'</div></div>';
+  }
+  const btn=(name)=>{ let cls='pick'; if(winner===name)cls+=' won'; else if(winner)cls+=' lost';
+    return '<button class="'+cls+'" onclick="pickKO(\''+id+'\',\''+name+'\')">'+CROWN+name+'</button>'; };
+  html+='<div class="card"><div class="match">'+btn(m[0])+'<div class="vs">vs</div>'+btn(m[1])+'</div></div>';
+  const next=ORDER[ORDER.indexOf(id)+1];
+  const label=id==='final'?'Crown the champion &#127942;':'Next &rarr;';
+  html+='<button class="cta '+(winner?(id==='final'?'gold':'')+'' :'disabled')+'" onclick="'+(winner?'go(\''+next+'\')':'')+'">'+(winner?label:'Tap a winner to continue')+'</button>';
+  html+='<button class="ghost" style="width:100%" onclick="go(\''+ORDER[ORDER.indexOf(id)-1]+'\')">&larr; Back</button>';
+  app.innerHTML=html;
+}
+function pickKO(id,name){
+  const was=state.ko[id];
+  if(was===name) delete state.ko[id]; else state.ko[id]=name;
+  if(id==='sf1'||id==='sf2'){ delete state.ko.third; delete state.ko.final; }
+  save();
+  if(state.ko[id] && was!==name){ ac(); sWin(); burst(28,false); } else { ac(); sOff(); }
+  render();
+}
+
+function screenHome(){
+  let names=[...T.pools.A,...T.pools.B];
+  let html='<div class="home">';
+  html+='<div class="yr">'+T.year+'</div>';
+  html+='<h1>THE<br>FAMILY<br>CUP</h1>';
+  html+='<div class="sub">Five games. Eight players. One backyard champion.</div>';
+  html+='<div class="roster">'+names.map(n=>'<span class="chip">'+n+'</span>').join('')+'</div>';
+  html+='<button class="cta gold" style="max-width:320px" onclick="ac();go(\'r1\')">Start the tournament</button>';
+  const started = Object.keys(state.group).length>0;
+  if(started) html+='<button class="ghost" onclick="go(resumeScreen())">Resume where you left off &rarr;</button>';
+  html+='</div>';
+  app.innerHTML=html;
+}
+function resumeScreen(){
+  for(const k of ['r1','r2','r3','r4','r5']) if(!roundDone(k)) return k;
+  if(!state.advancers) return 'standings';
+  for(const id of ['sf1','sf2','third','final']) if(!state.ko[id]) return id;
+  return 'champion';
+}
+
+function screenChampion(){
+  const champ=state.ko.final;
+  const useGif=!!state.gifs.trophy;
+  let html='<div class="champ">';
+  html+='<div class="ko-badge gold">'+T.year+' Family Cup</div>';
+  html+='<div class="lead">Grand Champion</div>';
+  html+='<div class="name">'+champ+'</div>';
+  if(useGif) html+='<div class="trophygif"><img src="'+toGifUrl(state.gifs.trophy)+'" onerror="this.parentNode.remove()" alt="trophy"></div>';
+  else html+='<canvas id="trophyCanvas" width="1080" height="1350"></canvas>';
+  if(state.gifs.champ) html+='<div class="gifbox"><img src="'+toGifUrl(state.gifs.champ)+'" onerror="this.parentNode.remove()" alt=""></div>';
+  html+='<div class="tag">Undisputed across ladderball, cornhole, Doink, beachball, ring toss, and nerve.</div>';
+  html+='<button class="cta gold" style="margin-top:18px" onclick="shareTrophy()">&#128241; Text the trophy</button>';
+  html+='<button class="ghost" onclick="fireworks();sChamp()">Play it again &#127881;</button>';
+  html+='<button class="ghost" onclick="go(\'final\')">&larr; Back</button>';
+  html+='</div>';
+  app.innerHTML=html;
+  if(!useGif){
+    const tc=document.getElementById('trophyCanvas');
+    drawTrophy(tc, champ);
+    if(document.fonts && document.fonts.ready){ document.fonts.ready.then(()=>{ if(document.getElementById('trophyCanvas')===tc) drawTrophy(tc, champ); }); }
+  }
+  setTimeout(()=>{ if(!playClip(state.gifs.champAudio)){ ac(); sChamp(); } fireworks(); },300);
+}
+
+function render(){
+  const s=state.screen;
+  if(s!=='gap') stopClip();
+  if(s==='home') return screenHome();
+  if(['r1','r2','r3','r4','r5'].includes(s)) return screenRound(s);
+  if(s==='gap') return screenGap();
+  if(s==='standings') return screenStandings();
+  if(['sf1','sf2','third','final'].includes(s)) return screenKO(s);
+  if(s==='champion') return screenChampion();
+  screenHome();
+}
+
+/* ---------- trophy drawing + share ---------- */
+function star(ctx,x,y,r,pts,inner){
+  ctx.beginPath();
+  for(let i=0;i<pts*2;i++){ const rad=(i%2?inner:r), a=Math.PI*i/pts-Math.PI/2;
+    ctx[i?'lineTo':'moveTo'](x+Math.cos(a)*rad, y+Math.sin(a)*rad); }
+  ctx.closePath();
+}
+function drawTrophy(canvas,name){
+  const ctx=canvas.getContext('2d'), W=canvas.width, H=canvas.height, cx=W/2;
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#141a4a'); bg.addColorStop(.55,'#101642'); bg.addColorStop(1,'#241041');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+  const glow=ctx.createRadialGradient(cx,560,40,cx,560,560);
+  glow.addColorStop(0,'rgba(255,197,49,.28)'); glow.addColorStop(1,'rgba(255,197,49,0)');
+  ctx.fillStyle=glow; ctx.fillRect(0,0,W,H);
+  // sparkles
+  const sp=[[180,300,10],[900,260,13],[240,900,9],[860,940,12],[140,620,7],[940,640,8],[520,180,9],[700,1080,8],[360,1120,7]];
+  ctx.fillStyle='#FBF4E6';
+  sp.forEach(([x,y,r])=>{ ctx.globalAlpha=.85; star(ctx,x,y,r,4,r*.36); ctx.fill(); });
+  ctx.globalAlpha=1;
+  // gold gradient
+  const gold=ctx.createLinearGradient(0,440,0,880);
+  gold.addColorStop(0,'#FFE7A0'); gold.addColorStop(.5,'#FFC531'); gold.addColorStop(1,'#D98A08');
+  // handles
+  ctx.strokeStyle='#E7A712'; ctx.lineWidth=34; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(cx-176,500); ctx.quadraticCurveTo(cx-286,560,cx-176,632); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx+176,500); ctx.quadraticCurveTo(cx+286,560,cx+176,632); ctx.stroke();
+  // bowl
+  ctx.fillStyle=gold;
+  ctx.beginPath();
+  ctx.moveTo(cx-186,472); ctx.bezierCurveTo(cx-186,672,cx-92,772,cx,772);
+  ctx.bezierCurveTo(cx+92,772,cx+186,672,cx+186,472); ctx.closePath(); ctx.fill();
+  // rim
+  ctx.fillStyle='#FFDE82'; ctx.beginPath(); ctx.ellipse(cx,472,190,34,0,0,7); ctx.fill();
+  ctx.fillStyle='#E7A712'; ctx.beginPath(); ctx.ellipse(cx,472,190,34,0,0,Math.PI); ctx.fill();
+  // stem + base
+  ctx.fillStyle=gold; ctx.fillRect(cx-30,772,60,66);
+  ctx.beginPath(); ctx.moveTo(cx-96,900); ctx.lineTo(cx+96,900); ctx.lineTo(cx+64,838); ctx.lineTo(cx-64,838); ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#E7A712'; ctx.fillRect(cx-124,900,248,40);
+  // star on cup
+  ctx.fillStyle='#8a5a00'; star(ctx,cx,588,64,5,26); ctx.fill();
+  ctx.fillStyle='#FFF3CF'; star(ctx,cx,584,58,5,23); ctx.fill();
+  // text
+  ctx.textAlign='center';
+  ctx.fillStyle='#FBF4E6'; ctx.font='64px "Bebas Neue", sans-serif';
+  ctx.fillText('THE FAMILY CUP · '+T.year, cx, 200);
+  ctx.fillStyle='#FFC531'; ctx.font='150px "Bebas Neue", sans-serif';
+  ctx.fillText('CHAMPION', cx, 1080);
+  ctx.fillStyle='#FBF4E6'; ctx.font='120px "Bebas Neue", sans-serif';
+  const nm=(name||'').toUpperCase();
+  ctx.font=(nm.length>9?'96px':'120px')+' "Bebas Neue", sans-serif';
+  ctx.fillText(nm, cx, 1210);
+}
+function shareTrophy(){
+  if(state.gifs.trophy) return shareGif(state.gifs.trophy);
+  const canvas=document.getElementById('trophyCanvas');
+  if(!canvas) return;
+  canvas.toBlob(async (blob)=>{
+    if(!blob) return;
+    const file=new File([blob],'family-cup-champion.png',{type:'image/png'});
+    const champ=state.ko.final;
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      try{ await navigator.share({files:[file], title:'Family Cup Champion', text:champ+' wins the '+T.year+' Family Cup! 🏆'}); return; }catch(e){}
+    }
+    const url=URL.createObjectURL(blob); const a=document.createElement('a');
+    a.href=url; a.download='family-cup-champion.png'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  },'image/png');
+}
+async function shareGif(rawUrl){
+  const url=toGifUrl(rawUrl);
+  const champ=state.ko.final, text=champ+' wins the '+T.year+' Family Cup! 🏆';
+  try{
+    const res=await fetch(url,{mode:'cors'});
+    if(res.ok){ const blob=await res.blob(); const file=new File([blob],'family-cup-trophy.gif',{type:blob.type||'image/gif'});
+      if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], text}); return; } }
+  }catch(e){}
+  if(navigator.share){ try{ await navigator.share({url, text}); return; }catch(e){} }
+  try{ await navigator.clipboard.writeText(url); toast('Trophy GIF link copied. Paste it into a text.'); }
+  catch(e){ toast('Long-press the trophy to save and send it.'); }
+}
+
+/* ---------- top controls ---------- */
+const soundBtn=document.getElementById('soundBtn');
+function paintSound(){ soundBtn.innerHTML = muted?'&#128263;':'&#128266;'; }
+paintSound();
+soundBtn.onclick=()=>{ muted=!muted; store.set('fc_mute',muted?'1':'0'); paintSound(); if(!muted){ ac(); sWin(); } };
+const confirmSheet=document.getElementById('confirmSheet');
+let confirmYes=null;
+document.getElementById('confirmNo').onclick=()=>confirmSheet.classList.remove('open');
+document.getElementById('confirmYes').onclick=()=>{ confirmSheet.classList.remove('open'); if(confirmYes) confirmYes(); };
+function askConfirm(msg,onYes){ document.getElementById('confirmMsg').textContent=msg; confirmYes=onYes; confirmSheet.classList.add('open'); }
+document.getElementById('resetBtn').onclick=()=>{
+  askConfirm('This clears every result. Your GIFs stay saved.', ()=>{
+    state={ v:5, screen:'home', group:{}, sel:{A:[],B:[]}, advancers:null, ko:{}, gifs:state.gifs };
+    save(); render(); toast('New tournament ready.');
+  });
+};
+const gifSheet=document.getElementById('gifSheet');
+function gifField(label,id,val,multi,ph){
+  const input = multi
+    ? '<textarea id="'+id+'" placeholder="'+ph+'">'+val+'</textarea>'
+    : '<input id="'+id+'" placeholder="'+ph+'" value="'+val.replace(/"/g,'&quot;')+'">';
+  return '<div class="field"><label>'+label+'</label>'+input+'</div>';
+}
+document.getElementById('gifBtn').onclick=()=>{
+  let h='';
+  h+='<div style="margin-top:12px;padding:12px;border:1px solid rgba(255,197,49,.4);border-radius:14px;background:rgba(255,197,49,.08)"><div style="font-weight:600;color:var(--gold);margin-bottom:2px">Default pool · plays between every round</div>';
+  h+='<p style="font-size:12px;color:rgba(251,244,230,.6);margin:0 0 8px">The easy path: drop a handful of funny gifs here once. A game with its own list below overrides this.</p>';
+  h+=gifField('Winner gifs (one per line)','gf_default',(state.gifs.defaultGifs||[]).join('\n'),true,'https://giphy.com/gifs/...');
+  h+=gifField('Audio clip URL (optional)','au_default',state.gifs.defaultAudio||'',false,'link to an .mp3 / .m4a');
+  h+='</div>';
+  T.rounds.forEach(r=>{
+    const val=(state.gifs.games[r.key]||[]).join('\n');
+    const aud=state.gifs.audio[r.key]||'';
+    h+='<div style="margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)"><div style="font-weight:600;color:var(--gold);margin-bottom:2px">'+r.game+' <span style="font-weight:400;color:rgba(251,244,230,.5);font-size:13px">(optional override)</span></div>';
+    h+=gifField('Winner gifs (one per line)','gf_'+r.key,val,true,'leave blank to use the default pool');
+    h+=gifField('Audio clip URL (optional)','au_'+r.key,aud,false,'link to an .mp3 / .m4a');
+    h+='</div>';
+  });
+  h+='<div style="margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)"><div style="font-weight:600;color:var(--gold);margin-bottom:2px">Champion</div>';
+  h+=gifField('Championship celebration gif','gf_champ',state.gifs.champ||'',false,'one specific gif');
+  h+=gifField('Championship audio URL (optional)','au_champ',state.gifs.champAudio||'',false,'link to an .mp3 / .m4a');
+  h+=gifField('Trophy gif to text the winner','gf_trophy',state.gifs.trophy||'',false,'blank uses the drawn trophy');
+  h+='</div>';
+  document.getElementById('gifFields').innerHTML=h;
+  gifSheet.classList.add('open');
+};
+document.getElementById('gifClose').onclick=()=>gifSheet.classList.remove('open');
+document.getElementById('gifSave').onclick=()=>{
+  const lines=v=>v.split(/[\n,]+/).map(s=>s.trim()).filter(Boolean);
+  state.gifs.defaultGifs=lines((document.getElementById('gf_default')||{}).value||'');
+  state.gifs.defaultAudio=((document.getElementById('au_default')||{}).value||'').trim();
+  T.rounds.forEach(r=>{
+    state.gifs.games[r.key]=lines((document.getElementById('gf_'+r.key)||{}).value||'');
+    state.gifs.audio[r.key]=((document.getElementById('au_'+r.key)||{}).value||'').trim();
+  });
+  state.gifs.champ=(document.getElementById('gf_champ').value||'').trim();
+  state.gifs.champAudio=(document.getElementById('au_champ').value||'').trim();
+  state.gifs.trophy=(document.getElementById('gf_trophy').value||'').trim();
+  save(); gifSheet.classList.remove('open');
+  toast('Saved.');
+  if(state.screen==='champion') render();
+};
+
+render();
+</script>
+</body>
+</html>
