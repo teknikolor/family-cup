@@ -568,9 +568,13 @@ function swapSlot(mi,si){
   if(state.group[editRound+'-'+mi]) return;                 // played match → locked
   if(!editSel){ editSel={m:mi,s:si}; render(); return; }
   if(editSel.m===mi && editSel.s===si){ editSel=null; render(); return; }  // deselect
-  const a=editPairs[editSel.m][editSel.s];
-  editPairs[editSel.m][editSel.s]=editPairs[mi][si];
-  editPairs[mi][si]=a;                                      // exchange contents
+  // Pair the two tapped players: put the 2nd player opposite the 1st, and move the
+  // 1st player's former opponent into the 2nd player's old slot. Their two former
+  // opponents thus become a match. Both endpoints are in unplayed matches.
+  const opp = 1 - editSel.s;                                // 1st player's opponent slot
+  const displaced = editPairs[editSel.m][opp];
+  editPairs[editSel.m][opp] = editPairs[mi][si];            // 2nd player moves next to 1st
+  editPairs[mi][si] = displaced;                            // former opponent takes the vacated slot
   editSel=null;
   ac(); sWin();
   render();
@@ -675,7 +679,7 @@ function screenRound(k){
     let html=progressBar(k);
     html+='<div class="eyebrow">'+r.note+'</div>';
     html+='<h2 class="round-title">Edit matchups</h2>';
-    html+='<div class="round-note">Tap a player, then tap another to swap them. Played matches are locked.</div>';
+    html+='<div class="round-note">Tap two players to make them face each other. Played matches are locked.</div>';
     editPairs.forEach((m,i)=>html+=editCard(k,i,m));
     html+='<button class="cta gold" onclick="saveMatchups()">Save matchups</button>';
     html+='<button class="ghost" style="width:100%" onclick="cancelMatchups()">Cancel</button>';
