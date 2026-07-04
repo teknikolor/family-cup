@@ -69,6 +69,14 @@ body{
 .pick .crown{position:absolute;top:-16px;left:50%;transform:translateX(-50%) translateY(6px) scale(.4);opacity:0;transition:transform .3s cubic-bezier(.2,1.4,.4,1),opacity .2s;width:38px;height:38px}
 .pick.won .crown{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
 .pool-tag{position:absolute;top:8px;left:10px;font-size:11px;font-weight:600;letter-spacing:.08em;color:rgba(0,0,0,.35)}
+/* matchup edit mode */
+.pick.editslot{background:var(--cream);color:var(--ink)}
+.pick.editslot.sel{box-shadow:0 0 0 3px var(--gold),0 6px 18px rgba(255,177,30,.45);transform:translateY(1px)}
+.pick.locked{opacity:.5;filter:saturate(.5);cursor:default}
+.pick.locked:active{transform:none}
+.card.locked{border-style:dashed}
+.editbtn{width:100%;margin-top:14px;padding:11px 16px;background:none;border:1px solid rgba(255,197,49,.5);border-radius:99px;color:var(--gold);font-family:'Fredoka';font-weight:600;font-size:15px;cursor:pointer}
+.editbtn:active{transform:scale(.98)}
 
 /* standings */
 .pool-block{margin-top:14px}
@@ -334,7 +342,7 @@ function normGifs(g){
   if(g&&typeof g.trophy==='string') out.trophy=g.trophy;
   return out;
 }
-function initialState(){ return { v:5, screen:'home', group:{}, sel:{A:[],B:[]}, advancers:null, ko:{}, gifs:emptyGifs() }; }
+function initialState(){ return { v:5, screen:'home', group:{}, matches:{}, sel:{A:[],B:[]}, advancers:null, ko:{}, gifs:emptyGifs() }; }
 /* Firebase RTDB drops empty objects/arrays/nulls, so a cup read back can be
    missing group/sel/ko/etc. Rehydrate the full shape before the app uses it. */
 function normState(s){
@@ -342,6 +350,8 @@ function normState(s){
   s.v = 5;
   if(typeof s.screen !== 'string') s.screen = 'home';
   if(!s.group || typeof s.group !== 'object') s.group = {};
+  if(!s.matches || typeof s.matches !== 'object'){ s.matches = {}; }
+  else { for(const k in s.matches){ const def=roundByKey(k); if(!def || !Array.isArray(s.matches[k]) || s.matches[k].length!==def.matches.length) delete s.matches[k]; } }
   if(!s.sel || typeof s.sel !== 'object') s.sel = {A:[],B:[]};
   if(!Array.isArray(s.sel.A)) s.sel.A = [];
   if(!Array.isArray(s.sel.B)) s.sel.B = [];
@@ -521,15 +531,16 @@ const CROWN='<svg class="crown" viewBox="0 0 24 24" fill="none"><path d="M3 8l4 
 
 /* ---------- helpers ---------- */
 function roundByKey(k){ return T.rounds.find(r=>r.key===k); }
-function roundDone(k){ const r=roundByKey(k); return r.matches.every((m,i)=>state.group[k+'-'+i]); }
+function matchesOf(k){ return (state.matches && state.matches[k]) || roundByKey(k).matches; }
+function roundDone(k){ return matchesOf(k).every((m,i)=>state.group[k+'-'+i]); }
 function winsIn(pool){
   const players=T.pools[pool], w=Object.fromEntries(players.map(p=>[p,0]));
-  ['r1','r2','r3'].forEach(k=>roundByKey(k).matches.forEach((m,i)=>{
+  ['r1','r2','r3'].forEach(k=>matchesOf(k).forEach((m,i)=>{
     const win=state.group[k+'-'+i]; if(win&&players.includes(win)) w[win]++;
   }));
   return w;
 }
-function beachWin(name){ let ok=false; roundByKey('r4').matches.forEach((m,i)=>{ if(m.includes(name)&&state.group['r4-'+i]===name) ok=true; }); return ok; }
+function beachWin(name){ let ok=false; matchesOf('r4').forEach((m,i)=>{ if(m.includes(name)&&state.group['r4-'+i]===name) ok=true; }); return ok; }
 function rankPool(pool){
   const w=winsIn(pool);
   return [...T.pools[pool]].sort((a,b)=> (w[b]-w[a]) || (beachWin(b)-beachWin(a)) || T.pools[pool].indexOf(a)-T.pools[pool].indexOf(b));
@@ -538,7 +549,45 @@ function other(match,name){ return match[0]===name?match[1]:match[0]; }
 
 /* ---------- render ---------- */
 const app=document.getElementById('app');
-function go(screen){ state.screen=screen; save(); render(); window.scrollTo(0,0); }
+
+/* transient, client-only matchup-edit state (never synced/persisted) */
+let editRound=null;   // round key being edited, or null
+let editPairs=null;   // working copy: array of [a,b], deep-cloned from matchesOf(k)
+let editSel=null;     // selected slot {m:matchIndex, s:side 0|1} or null
+function resetEdit(){ editRound=null; editPairs=null; editSel=null; }
+
+function editMatchups(k){
+  if(!canEdit()) return;
+  editRound=k;
+  editPairs=matchesOf(k).map(m=>[m[0],m[1]]);
+  editSel=null;
+  render();
+}
+function swapSlot(mi,si){
+  if(!canEdit() || editRound===null) return;
+  if(state.group[editRound+'-'+mi]) return;                 // played match → locked
+  if(!editSel){ editSel={m:mi,s:si}; render(); return; }
+  if(editSel.m===mi && editSel.s===si){ editSel=null; render(); return; }  // deselect
+  const a=editPairs[editSel.m][editSel.s];
+  editPairs[editSel.m][editSel.s]=editPairs[mi][si];
+  editPairs[mi][si]=a;                                      // exchange contents
+  editSel=null;
+  ac(); sWin();
+  render();
+}
+function saveMatchups(){
+  if(!canEdit() || editRound===null) return;
+  const k=editRound, def=roundByKey(k).matches;
+  const same=editPairs.every((m,i)=>m[0]===def[i][0] && m[1]===def[i][1]);
+  if(same){ if(state.matches) delete state.matches[k]; }
+  else { if(!state.matches) state.matches={}; state.matches[k]=editPairs.map(m=>[m[0],m[1]]); }
+  resetEdit();
+  save(); render();
+  toast('Matchups saved.');
+}
+function cancelMatchups(){ resetEdit(); render(); }
+
+function go(screen){ resetEdit(); state.screen=screen; save(); render(); window.scrollTo(0,0); }
 
 function progressBar(activeKey){
   const steps=['r1','r2','r3','r4','r5','ko'];
@@ -557,6 +606,20 @@ function pickCard(rkey, idx, match){
     return '<button class="'+cls+'" onclick="pickWin(\''+key+'\',\''+name+'\')">'+CROWN+tag+name+'</button>';
   };
   return '<div class="card"><div class="match">'+btn(match[0])+'<div class="vs">vs</div>'+btn(match[1])+'</div></div>';
+}
+
+function editCard(rkey, idx, match){
+  const played=!!state.group[rkey+'-'+idx];
+  const slot=(name,side)=>{
+    const tag='<span class="pool-tag">Pool '+poolOf(name)+'</span>';
+    if(played){
+      const won=state.group[rkey+'-'+idx]===name;
+      return '<button class="pick locked'+(won?' won':' lost')+'" disabled>'+tag+name+'</button>';
+    }
+    const sel = (editSel && editSel.m===idx && editSel.s===side) ? ' sel' : '';
+    return '<button class="pick editslot'+sel+'" onclick="swapSlot('+idx+','+side+')">'+tag+name+'</button>';
+  };
+  return '<div class="card'+(played?' locked':'')+'"><div class="match">'+slot(match[0],0)+'<div class="vs">vs</div>'+slot(match[1],1)+'</div></div>';
 }
 
 function pickWin(key,name){
@@ -606,13 +669,28 @@ function screenGap(){
 }
 
 function screenRound(k){
-  const r=roundByKey(k); const done=roundDone(k);
+  const r=roundByKey(k);
+  const ms=matchesOf(k);
+  if(editRound===k){
+    let html=progressBar(k);
+    html+='<div class="eyebrow">'+r.note+'</div>';
+    html+='<h2 class="round-title">Edit matchups</h2>';
+    html+='<div class="round-note">Tap a player, then tap another to swap them. Played matches are locked.</div>';
+    editPairs.forEach((m,i)=>html+=editCard(k,i,m));
+    html+='<button class="cta gold" onclick="saveMatchups()">Save matchups</button>';
+    html+='<button class="ghost" style="width:100%" onclick="cancelMatchups()">Cancel</button>';
+    app.innerHTML=html;
+    return;
+  }
+  const done=roundDone(k);
   let html=progressBar(k);
   html+='<div class="eyebrow">'+r.note+'</div>';
   html+='<h2 class="round-title">'+r.game+'</h2>';
   html+='<div class="round-note">Tap the winner of each match. Tap the same name again to undo.</div>';
-  r.matches.forEach((m,i)=>html+=pickCard(k,i,m));
+  ms.forEach((m,i)=>html+=pickCard(k,i,m));
   html+='<button class="cta '+(done?'':'disabled')+'" onclick="'+(done?'toGap(\''+k+'\')':'')+'">'+(done?'Round complete &rarr;':'Pick every winner to continue')+'</button>';
+  const editable=ms.reduce((n,m,i)=>n+(state.group[k+'-'+i]?0:1),0);
+  if(canEdit() && editable>=2) html+='<button class="editbtn" onclick="editMatchups(\''+k+'\')">&#9998; Edit matchups</button>';
   if(k!=='r1') html+='<button class="ghost" style="width:100%" onclick="go(\''+ORDER[ORDER.indexOf(k)-1]+'\')">&larr; Back</button>';
   app.innerHTML=html;
 }
@@ -886,8 +964,8 @@ function askConfirm(msg,onYes){ document.getElementById('confirmMsg').textConten
 document.getElementById('resetBtn').onclick=()=>{
   if(!canEdit()) return;
   askConfirm('This clears every result. Your GIFs stay saved.', ()=>{
-    state={ v:5, screen:'home', group:{}, sel:{A:[],B:[]}, advancers:null, ko:{}, gifs:state.gifs, hostCode:state.hostCode, name:state.name };
-    prevFinal=undefined; save(); render(); toast('New tournament ready.');
+    state={ v:5, screen:'home', group:{}, matches:{}, sel:{A:[],B:[]}, advancers:null, ko:{}, gifs:state.gifs, hostCode:state.hostCode, name:state.name };
+    prevFinal=undefined; resetEdit(); save(); render(); toast('New tournament ready.');
   });
 };
 const gifSheet=document.getElementById('gifSheet');
