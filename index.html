@@ -335,8 +335,23 @@ function normGifs(g){
   return out;
 }
 function initialState(){ return { v:5, screen:'home', group:{}, sel:{A:[],B:[]}, advancers:null, ko:{}, gifs:emptyGifs() }; }
+/* Firebase RTDB drops empty objects/arrays/nulls, so a cup read back can be
+   missing group/sel/ko/etc. Rehydrate the full shape before the app uses it. */
+function normState(s){
+  s = (s && typeof s==='object') ? s : {};
+  s.v = 5;
+  if(typeof s.screen !== 'string') s.screen = 'home';
+  if(!s.group || typeof s.group !== 'object') s.group = {};
+  if(!s.sel || typeof s.sel !== 'object') s.sel = {A:[],B:[]};
+  if(!Array.isArray(s.sel.A)) s.sel.A = [];
+  if(!Array.isArray(s.sel.B)) s.sel.B = [];
+  if(s.advancers === undefined) s.advancers = null;
+  if(!s.ko || typeof s.ko !== 'object') s.ko = {};
+  s.gifs = normGifs(s.gifs);
+  return s;
+}
 function loadFrom(key){
-  try{ const s = JSON.parse(store.get(key)); if(s&&s.v===5){ s.gifs=normGifs(s.gifs); return s; } }catch(e){}
+  try{ const s = JSON.parse(store.get(key)); if(s&&s.v===5){ return normState(s); } }catch(e){}
   return null;
 }
 function load(){ return loadFrom(storeKey()) || initialState(); }
@@ -366,7 +381,7 @@ function hasProgress(s){
    Never blocks the UI: a null/empty cup or a read error still resolves to a sensible local view. */
 function applyRemote(remote, err){
   if(err){ toast('Live sync error — check your database rules. Running on this device.'); }
-  if(remote){ try{ remote.gifs=normGifs(remote.gifs); }catch(e){ remote.gifs=emptyGifs(); } }
+  if(remote){ remote = normState(remote); }   // RTDB strips empty group/sel/ko/etc — restore them
   const newFinal = (remote && remote.ko) ? remote.ko.final : undefined;
 
   if(!syncInit){                       // first snapshot
